@@ -27,7 +27,7 @@ def __main__(argv):
 		elif opt in ("-o", "--output"):
 			output_path = arg
 
-	print "\n"
+	print("\n")
 
 
 	#get name

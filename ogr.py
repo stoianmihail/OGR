@@ -16,22 +16,22 @@ import matplotlib.pyplot as plt
 
 
 def preprocessing(pixels):
-	print "-------------Preprocessing phase--------------"
+	print("-------------Preprocessing phase--------------")
 	
 	#Gaussian filter
-	print "Passing gaussian filter."
+	print("Passing gaussian filter.")
 	pixels = filters.gaussian(pixels)
 
 	#define threshold to binarization of image
 	k = util.otsu_thresholding(pixels)
-	print "Threshold used in the binarization: %d" % (k)
+	print(("Threshold used in the binarization: %d" % (k)))
 	#binarize image using the threshold k
-	print "Getting binarized image."
+	print("Getting binarized image.")
 	pixels = util.binarization(pixels, k)
 
-	print "Closing operator."
+	print("Closing operator.")
 	pixels = morphology.binary_closing(pixels)
-	print "Opening operator."
+	print("Opening operator.")
 	pixels = morphology.binary_opening(pixels)
 
 	return pixels
@@ -39,14 +39,14 @@ def preprocessing(pixels):
 
 
 def segmentation(pixels, k=5):
-	print "-------------Segmentation phase--------------"
+	print("-------------Segmentation phase--------------")
 	
-	print "Applying %d erosions to get vertices pixels." % (k)
+	print(("Applying %d erosions to get vertices pixels." % (k)))
 	vertices_pixel = np.copy(pixels)
 	for i in range(0, k):
 		vertices_pixel = morphology.binary_erosion(vertices_pixel)
 
-	print "Applying %d dilations to get 'original' size of vertices." % (k)
+	print("Applying %d dilations to get 'original' size of vertices." % (k))
 	for i in range(0, k):
 		vertices_pixel = morphology.binary_dilation(vertices_pixel)
 	
@@ -98,15 +98,15 @@ def get_connected_components_bfs_search(vertices_pixel):
 
 
 def topology_recognition(pixels, vertices_pixel):
-	print "-------------Topology recognition phase--------------"
+	print("-------------Topology recognition phase--------------")
 
-	print "Skelonization image."
+	print("Skelonization image.")
 	skel = morphology.zhang_and_suen_binary_thinning(pixels)
 
-	print "Edge classification."
+	print("Edge classification.")
 	classified_pixels, port_pixels = edge_classification(skel, vertices_pixel)
 
-	print "Edges section identify."
+	print("Edges section identify.")
 	trivial_sections, port_sections, crossing_pixels_in_port_sections, last_gradients = edge_sections_identify(classified_pixels, port_pixels)
 	merged_sections = traversal_subphase(classified_pixels, crossing_pixels_in_port_sections, last_gradients)
 	edge_sections = trivial_sections + merged_sections
@@ -281,7 +281,7 @@ def merge_sections(crossing_pixels_in_port_sections, section, crossing_section, 
 	#next is an edge pixel
 	next = crossing_section[-1]
 
-	if not crossing_pixels_in_port_sections.has_key(key_back):
+	if key_back not in crossing_pixels_in_port_sections:
 		return False
 
 	for info_section in crossing_pixels_in_port_sections[key_back]:
@@ -458,7 +458,7 @@ def distance_heuristic_grads(common_grads, possible_grads, grad):
 
 	for _grad in common_grads:
 		aux =  [_grad[1] * z for z in _grad[0]]
-		average_common_grad = map(sum, zip(average_common_grad, aux))
+		average_common_grad = list(map(sum, list(zip(average_common_grad, aux))))
 		n += _grad[1]
 
 	average_common_grad = [z / n for z in average_common_grad]
@@ -525,21 +525,21 @@ def get_dict_edge_sections(edge_sections, vertices_pixel):
 
 
 def postprocessing(vertices_pixel, dict_edge_sections):
-	print "-------------Posprocessing phase--------------"
+	print("-------------Posprocessing phase--------------")
 	
 	G = nx.Graph()
 
-	print "Getting vertices coordinates."
+	print("Getting vertices coordinates.")
 	array_connected_components, connected_components = get_connected_components_bfs_search(vertices_pixel)
 	vertices_coordinates = get_vertices_coordinates(connected_components)
 
 
-	print "Adding vertices in the graph."
+	print("Adding vertices in the graph.")
 	for u in connected_components:
 		G.add_node(u, x=vertices_coordinates[u][0], y=vertices_coordinates[u][1])
 
 
-	print "Getting edges extremes and adding edges in the graph."
+	print("Getting edges extremes and adding edges in the graph.")
 	for (pos_u, pos_v) in dict_edge_sections:
 		
 		u = array_connected_components[pos_u[0], pos_u[1]]
@@ -556,7 +556,7 @@ def get_vertices_coordinates(vertices_connected_components):
 	vertices_coordinates = dict.fromkeys(vertices_connected_components, (0, 0))
 
 	for label in vertices_connected_components:
-		[x, y] =  map(sum, zip(*vertices_connected_components[label]))
+		[x, y] =  list(map(sum, list(zip(*vertices_connected_components[label]))))
 		n = len(vertices_connected_components[label])
 		vertices_coordinates[label]  = (x / n, y / n)
 
@@ -599,7 +599,7 @@ def convert_to_topological_graph(pixels, path = None, name=None):
 	#get end time of preprocessing phase
 	end_time = time()
 	spent_time = (end_time - start_time)
-	print "Time spent in the preprocessing phase: %.4f(s)\n" % (spent_time)
+	print("Time spent in the preprocessing phase: %.4f(s)\n" % (spent_time))
 
 	#Visualization
 	preprocessing_pixels = np.copy(pixels)
@@ -616,7 +616,7 @@ def convert_to_topological_graph(pixels, path = None, name=None):
 	#get end time of segmentation phase
 	end_time = time()
 	spent_time = (end_time - start_time)
-	print "Time spent in the segmentation phase: %.4f(s)\n" % (spent_time)
+	print("Time spent in the segmentation phase: %.4f(s)\n" % (spent_time))
 	#====================================================================================
 
 
@@ -630,7 +630,7 @@ def convert_to_topological_graph(pixels, path = None, name=None):
 	#get end time of topology recognition phase
 	end_time = time()
 	spent_time = (end_time - start_time)
-	print "Time spent in the topology recognition phase: %.4f(s)\n" % (spent_time)
+	print("Time spent in the topology recognition phase: %.4f(s)\n" % (spent_time))
 	#====================================================================================
 
 
@@ -645,26 +645,26 @@ def convert_to_topological_graph(pixels, path = None, name=None):
 	#get end time of posprocessing phase
 	end_time = time()
 	spent_time = (end_time - start_time)
-	print "Time spent in the topology recognition phase: %.4f(s)\n" % (spent_time)
+	print("Time spent in the topology recognition phase: %.4f(s)\n" % (spent_time))
 	#====================================================================================
 
 
 
 	end_time = time()
 	spent_time = (end_time - start_wall_time)
-	print "Total (wall) time spent: %.4f(s)\n" % (spent_time)
+	print("Total (wall) time spent: %.4f(s)\n" % (spent_time))
 
 
 
 	#====================================================================================	
 	#Resulting graph
-	print "---------------------Resulting graph--------------------"
-	print "Graph nodes: ", G.nodes()
-	print "Graph edges: ", G.edges()
+	print("---------------------Resulting graph--------------------")
+	print("Graph nodes: ", G.nodes())
+	print("Graph edges: ", G.edges())
 
 	if not (path is None or name is None):
 		save_topological_graph(G, path + name + ".graphml")
-		print "\nGraphml saved on path: " + path + name + ".graphml"
+		print("\nGraphml saved on path: " + path + name + ".graphml")
 	#====================================================================================	
 
 
@@ -676,7 +676,7 @@ def convert_to_topological_graph(pixels, path = None, name=None):
 		for x in vertices_coordinates:
 			pos[x] = (vertices_coordinates[x][1], pixels.shape[0] - vertices_coordinates[x][0])
 
-		colors=range(nx.number_of_edges(G))
+		colors=list(range(nx.number_of_edges(G)))
 		nx.draw(G, pos=pos, node_color='#A0CBE2',edge_color=colors, width=4, edge_cmap=plt.cm.winter,with_labels=False)
 		plt.draw()
 		plt.savefig(path + name + "_result.png")

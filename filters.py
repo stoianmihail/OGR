@@ -6,7 +6,7 @@ def gaussian(pixels):
 	width = pixels.shape[1]
 
 	order = 5
-	offset = order / 2
+	offset = order // 2
 
 	mask = np.array([[1, 5, 8, 5, 1], [5, 21, 34, 21, 5], [8, 34, 55, 34, 8], [5, 21, 34, 21, 5], [1, 5, 8, 5, 1]])
 

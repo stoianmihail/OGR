@@ -15,7 +15,7 @@ def binary_erosion(A, B=None):
 		B = np.ones((3,3))
 
 	order = B.shape[0]
-	offset = order / 2
+	offset = order // 2
 
 	for x in range(offset, height - offset):
 		for y in range(offset, width - offset):
@@ -48,7 +48,7 @@ def binary_dilation(A, B=None):
 		B = np.ones((3,3))
 
 	order = B.shape[0]
-	offset = order / 2
+	offset = order // 2
 
 	for x in range(offset, height - offset):
 		for y in range(offset, width - offset):
